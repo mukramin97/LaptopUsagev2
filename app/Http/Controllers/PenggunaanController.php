@@ -42,26 +42,26 @@ class PenggunaanController extends Controller
             ->select('table_penggunaan.*','table_siswa.nama', 'table_siswa.NISN', 'table_kelas.nama_kelas', )
             ->get();
 
-        if($request->ajax()){
-            $allData = Datatables::of($penggunaanDt)
-            ->addIndexColumn()
-            ->addColumn('tanggal_pinjam', function($row) {
-                return $row->tanggal_pinjam;
-              })
-            ->addColumn('tanggal_kembali', function($row) {
-                return $row->tanggal_kembali;
-            })
-            ->addColumn('nama_kelas', function($row) {
-                return $row->nama_kelas;
-            })
-            ->addColumn('NISN', function($row) {
-                return $row->NISN;
-            })
-            ->rawColumns(['action', 'nama_kelas', 'NISN'])
-            ->make(true);
+            if($request->ajax()){
+                $allData = Datatables::of($penggunaanDt)
+                ->addIndexColumn()
+                ->addColumn('tanggal_pinjam', function($row) {
+                    return $row->tanggal_pinjam;
+                })
+                ->addColumn('tanggal_kembali', function($row) {
+                    return $row->tanggal_kembali;
+                })
+                ->addColumn('nama_kelas', function($row) {
+                    return $row->nama_kelas;
+                })
+                ->addColumn('NISN', function($row) {
+                    return $row->NISN;
+                })
+                ->rawColumns(['action', 'nama_kelas', 'NISN'])
+                ->make(true);
 
-            return $allData;
-        }
+                return $allData;
+            }
 
         return view('Penggunaan.penggunaan', compact('penggunaanDt', 'kelasDt'));
     }

@@ -85,7 +85,6 @@
               { data: 'tanggal_kembali', name: 'tanggal_kembali'},
               { data: 'action', name: 'action', orderable: false, searchable: false,
                   render: function(data, type, full, meta){
-                    console.log(full);
                       return '<button class="btn btn-danger btn-sm custom-action-delete" data-id="'+full.id+'">Delete</button>';
               }},
           ],

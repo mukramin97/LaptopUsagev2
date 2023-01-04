@@ -4,10 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use DB;
 use App\Models\Laptop;
 use App\Models\Kelas;
 use App\Models\Siswa;
 use App\Models\Penggunaan;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
+
+use Yajra\DataTables\DataTables;
 
 use App\Exports\SiswaExport;
 use App\Imports\SiswaImport;
@@ -20,10 +25,38 @@ class SiswaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $siswaDt = Siswa::all();
-        return view('Siswa.siswa', compact('siswaDt'));
+        $siswaDt = Siswa::get();
+        $kelasDt = Kelas::all();
+
+        $siswaDt = DB::table('table_siswa')
+            ->join('table_kelas', 'table_siswa.kelas_id', '=', 'table_kelas.id')
+            ->join('table_laptop', 'table_siswa.laptop_id', '=', 'table_laptop.id')
+            ->when($request->filterKelas, function($query) use($request){ return
+                $query->where('table_siswa.kelas_id', $request->filterKelas);
+            })
+            ->select('table_siswa.*','table_kelas.nama_kelas', 'table_laptop.merk', 'table_laptop.spesifikasi', )
+            ->get();
+
+            if($request->ajax()){
+                $allData = Datatables::of($siswaDt)
+                ->addIndexColumn()
+                ->addColumn('nama_kelas', function($row) {
+                    return $row->nama_kelas;
+                })
+                ->addColumn('merk', function($row) {
+                    return $row->merk;
+                })
+                ->addColumn('spesifikasi', function($row) {
+                    return $row->spesifikasi;
+                })
+                ->rawColumns(['action', 'nama', 'NISN'])
+                ->make(true);
+                return $allData;
+            }
+        
+        return view('Siswa.siswa', compact('siswaDt', 'kelasDt'));
     }
 
     /**
@@ -45,21 +78,35 @@ class SiswaController extends Controller
      */
     public function store(Request $request)
     {
-        $laptop = Laptop::create([
-            'merk' => $request->merk,
-            'spesifikasi' => $request->spesifikasi,
+
+        $validatedData = Validator::make($request->all(), [
+            'NISN' => 'required|unique:table_siswa|numeric',
+            'nama' => 'required|min:3|max:255',
+            'kelas' => 'required|exists:table_kelas,id',
+            'merk' => 'required|min:3|max:255',
+            'spesifikasi' => 'required|min:3|max:255',
         ]);
 
-        $laptopId = $laptop->id;
+        if(!$validatedData->fails()){
+            $laptop = Laptop::create([
+                'merk' => $request->merk,
+                'spesifikasi' => $request->spesifikasi,
+            ]);
+    
+            $laptopId = $laptop->id;
+    
+            Siswa::create([
+                'NISN' => $request->NISN,
+                'nama' => $request->nama,
+                'kelas_id' => $request->kelas,
+                'laptop_id' => $laptopId,
+            ]);
+            return redirect('siswa');
+        }
+        else{
+            return response()->json(['status' => 0, 'error' => $validatedData->errors()->toArray()]);
+        };
 
-        Siswa::create([
-            'NISN' => $request->NISN,
-            'nama' => $request->nama,
-            'kelas_id' => $request->kelas,
-            'laptop_id' => $laptopId,
-        ]);
-
-        return redirect('siswa')->with('toast_success', 'Data Siswa Berhasil Ditambah!');
     }
 
     /**
@@ -83,6 +130,7 @@ class SiswaController extends Controller
     {
         $editSiswa = Siswa::findorfail($id);
         $kelasDt = Kelas::all();
+
         return view('Siswa.edit_siswa', compact('editSiswa', 'kelasDt'));
     }
 
@@ -95,19 +143,32 @@ class SiswaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $editSiswa = Siswa::findorfail($id);
-        $editSiswa->NISN = $request->NISN;
-        $editSiswa->nama = $request->nama;
-        $editSiswa->kelas_id = $request->kelas;
-        $laptopId = $editSiswa->laptop_id;
-        $editSiswa->save();
+        $validatedData = Validator::make($request->all(), [
+            'NISN' => 'required|numeric',
+            'nama' => 'required|min:3|max:255',
+            'kelas' => 'required|exists:table_kelas,id',
+            'merk' => 'required|min:3|max:255',
+            'spesifikasi' => 'required|min:3|max:255',
+        ]);
 
-        $editLaptop = Laptop::findorfail($laptopId);
-        $editLaptop->merk = $request->merk;
-        $editLaptop->spesifikasi = $request->spesifikasi;
-        $editLaptop->save();
+        if(!$validatedData->fails()){
+            $editSiswa = Siswa::findorfail($id);
+            $editSiswa->NISN = $request->NISN;
+            $editSiswa->nama = $request->nama;
+            $editSiswa->kelas_id = $request->kelas;
+            $laptopId = $editSiswa->laptop_id;
+            $editSiswa->save();
 
-        return redirect('siswa')->with('toast_success', 'Data Siswa Berhasil Diubah!');
+            $editLaptop = Laptop::findorfail($laptopId);
+            $editLaptop->merk = $request->merk;
+            $editLaptop->spesifikasi = $request->spesifikasi;
+            $editLaptop->save();
+            return redirect('siswa');
+        }
+        else{
+            return response()->json(['status' => 0, 'error' => $validatedData->errors()->toArray()]);
+        };   
+
     }
 
     /**
@@ -120,7 +181,11 @@ class SiswaController extends Controller
     {
         $deleteSiswa = Siswa::find($id);
         $deleteSiswa->delete();
-        return redirect('siswa')->with('toast_success', 'Kelas Berhasil Dihapus!');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data siswa berhasil dihapus',
+            'data' => $deleteSiswa,
+          ], 200);
     }
 
     public function siswaExport(){
