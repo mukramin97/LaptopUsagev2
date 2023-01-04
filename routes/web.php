@@ -28,6 +28,8 @@ Route::get('/', function () {
 })->middleware('auth');
 
 Route::middleware('auth')->resource('kelas', KelasController::class);
+Route::get('kelasExport', [KelasController::class, 'kelasExport'])->name('kelasExport')->middleware('auth');
+Route::post('kelasImport', [KelasController::class, 'kelasImport'])->name('kelasImport')->middleware('auth');
 
 Route::middleware('auth')->resource('siswa', SiswaController::class);
 Route::get('siswaExport', [SiswaController::class, 'siswaExport'])->name('siswaExport')->middleware('auth');
