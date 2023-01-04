@@ -27,17 +27,21 @@ Route::get('/', function () {
     return redirect('/dashboard');
 })->middleware('auth');
 
-Route::middleware('auth')->resource('kelas', KelasController::class);
+Route::middleware('auth')->resource('kelas', KelasController::class)->except(['destroy']);
+Route::delete('kelas/{id}', [KelasController::class, 'destroy'])->name('kelas.destroy')->middleware('superadmin');
 Route::get('kelasExport', [KelasController::class, 'kelasExport'])->name('kelasExport')->middleware('auth');
 Route::post('kelasImport', [KelasController::class, 'kelasImport'])->name('kelasImport')->middleware('auth');
 
-Route::middleware('auth')->resource('siswa', SiswaController::class);
+Route::middleware('auth')->resource('siswa', SiswaController::class)->except(['destroy']);
+Route::delete('siswa/{id}', [SiswaController::class, 'destroy'])->name('siswa.destroy')->middleware('superadmin');
 Route::get('siswaExport', [SiswaController::class, 'siswaExport'])->name('siswaExport')->middleware('auth');
 Route::post('siswaImport', [SiswaController::class, 'siswaImport'])->name('siswaImport')->middleware('auth');
 
-Route::middleware('auth')->resource('penggunaan', PenggunaanController::class);
+Route::middleware('auth')->resource('penggunaan', PenggunaanController::class)->except(['destroy']);
+Route::delete('penggunaan/{id}', [PenggunaanController::class, 'destroy'])->name('penggunaan.destroy')->middleware('superadmin');
 Route::post('storeByNISN', [PenggunaanController::class, 'storeByNISN'])->name('storeByNISN')->middleware('auth');
 Route::post('updateByNISN', [PenggunaanController::class, 'updateByNISN'])->name('updateByNISN')->middleware('auth');
 Route::get('penggunaanExport', [PenggunaanController::class, 'penggunaanExport'])->name('penggunaanExport')->middleware('auth');
 
-Route::middleware('auth')->resource('dashboard', DashboardController::class);
+Route::middleware('auth')->resource('dashboard', DashboardController::class)->except(['destroy']);
+Route::delete('dashboard/{id}', [DashboardController::class, 'destroy'])->name('dashboard.destroy')->middleware('superadmin');
