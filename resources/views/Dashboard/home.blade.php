@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-md-2">
                 <label for="filterKelas">Kelas</label>
-                <select name="filterKelas" id="filterKelas" class="form-control filter">
+                <select name="filterKelas" id="filterKelas" class="custom-select filter">
                     <option value="5">Pilih Kelas</option>
                     @foreach ($kelasDt as $data)
                         <option value="{{ $data->id }}">{{ $data->nama_kelas }}</option>
@@ -20,7 +20,7 @@
             </div>
             <div class="col-md-2">
                 <label for="modeInput">Mode Input</label>
-                <select name="modeInput" id="modeInput" class="form-control filter">
+                <select name="modeInput" id="modeInput" class="custom-select filter">
                     <option value="modePinjam" selected>Mode Pinjam</option>
                     <option value="modeKembali">Mode Kembali</option>
                 </select>

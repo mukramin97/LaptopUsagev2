@@ -89,7 +89,8 @@
               });
             }
             else{
-
+              //Manual going to siswa page because the return is not working cause method on this ajax(probably)
+              window.location.href = '/siswa';
             }
           }
         })

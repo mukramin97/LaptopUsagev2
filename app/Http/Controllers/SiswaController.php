@@ -20,6 +20,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SiswaController extends Controller
 {
+
+
+
     /**
      * Display a listing of the resource.
      *
@@ -78,6 +81,7 @@ class SiswaController extends Controller
      */
     public function store(Request $request)
     {
+
 
         $validatedData = Validator::make($request->all(), [
             'NISN' => 'required|unique:table_siswa|numeric',
