@@ -11,7 +11,7 @@
             <div class="col-md-2">
                 <label for="filterKelas">Kelas</label>
                 <select name="filterKelas" id="filterKelas" class="custom-select filter">
-                    <option value="5">Pilih Kelas</option>
+                    <option value="">Pilih Kelas</option>
                     @foreach ($kelasDt as $data)
                         <option value="{{ $data->id }}">{{ $data->nama_kelas }}</option>
                     @endforeach

@@ -62,7 +62,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Import Siswa</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Import Kelas</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -150,7 +150,7 @@
                   Swal.fire({
                       position: 'top-end',
                       icon: 'success',
-                      title: 'Data siswa berhasil dihapus!',
+                      title: 'Data kelas berhasil dihapus!',
                       showConfirmButton: false,
                       timer: 1000,
                       
