@@ -7,7 +7,7 @@ use App\Models\Laptop;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class SiswaExport implements FromCollection
+class SiswaExport implements FromCollection, WithHeadings
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -19,7 +19,7 @@ class SiswaExport implements FromCollection
             return [
                 'nama' => $siswa->nama,
                 'NISN' => $siswa->NISN,
-                'kelas_id' =>$siswa->kelas_id,
+                'nama_kelas' =>$siswa->kelas->nama_kelas,
                 'merk' => $siswa->laptop->merk,
                 'spesifikasi' => $siswa->laptop->spesifikasi,
                 
@@ -35,7 +35,7 @@ class SiswaExport implements FromCollection
         return [
             'Nama',
             'NISN',
-            'Kelas ID',
+            'Kelas',
             'Merk Laptop',
             'Spesifikasi',
         ];

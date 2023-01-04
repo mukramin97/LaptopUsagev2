@@ -199,7 +199,7 @@ class SiswaController extends Controller
     public function siswaImport(Request $request){
         $file = $request->file('file');
         $namaFile = $file->getClientOriginalName();
-        $file->move('DataSiswa', $namaFile);
+        $file->move(public_path('DataSiswa'), $namaFile);
 
         Excel::import(new SiswaImport, public_path('DataSiswa/'.$namaFile));
         return redirect('siswa');

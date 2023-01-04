@@ -3,11 +3,13 @@
 namespace App\Exports;
 
 use App\Models\Penggunaan;
+use App\Models\Kelas;
+
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Carbon\Carbon;
 
-class PenggunaanExport implements FromCollection
+class PenggunaanExport implements FromCollection, WithHeadings
 {
 
     protected $kelasId;
@@ -27,7 +29,8 @@ class PenggunaanExport implements FromCollection
     {
         $data = Penggunaan::query()
                    ->join('table_siswa', 'table_siswa.id', '=', 'table_penggunaan.siswa_id')
-                   ->select('table_siswa.nama', 'table_siswa.NISN', 'table_siswa.kelas_id', 'table_penggunaan.tanggal_pinjam', 'table_penggunaan.tanggal_kembali');
+                   ->join('table_kelas', 'table_kelas.id', '=', 'table_siswa.kelas_id')
+                   ->select('table_siswa.nama', 'table_siswa.NISN', 'table_kelas.nama_kelas','table_kelas.tingkatan', 'table_penggunaan.tanggal_pinjam', 'table_penggunaan.tanggal_kembali');
 
         // Filter by kelas_id if it is not null
         if ($this->kelasId) {
@@ -52,7 +55,8 @@ class PenggunaanExport implements FromCollection
         return [
             'Nama',
             'NISN',
-            'Kelas ID',
+            'Nama Kelas',
+            'Tingkatan',
             'Tanggal Pinjam',
             'Tanggal Kembali',
         ];
