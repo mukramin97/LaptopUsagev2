@@ -30,8 +30,8 @@
 
           </div>
           <div class="col-md-1">
-            <label for="exportPenggunaan">Export</label>
-            <button id="exportPenggunaan" class="btn btn-primary">Export</button>
+            <label for="exportPenggunaan" style="visibility: hidden">Export</label>
+            <button id="exportPenggunaan" class="btn btn-primary" style="width: 100%">Export</button>
           </div>
 
         </div>
