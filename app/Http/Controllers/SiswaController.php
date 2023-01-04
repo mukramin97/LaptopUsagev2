@@ -144,7 +144,7 @@ class SiswaController extends Controller
     public function update(Request $request, $id)
     {
         $validatedData = Validator::make($request->all(), [
-            'NISN' => 'required|numeric',
+            'NISN' => 'required|unique:table_siswa,NISN,' . $id . '|numeric',
             'nama' => 'required|min:3|max:255',
             'kelas' => 'required|exists:table_kelas,id',
             'merk' => 'required|min:3|max:255',
