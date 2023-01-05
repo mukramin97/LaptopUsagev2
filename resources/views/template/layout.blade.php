@@ -63,7 +63,7 @@
               <img alt="Avatar" class="table-avatar img-circle" src="{{ asset('AdminLTE/dist/img/avatar5.png') }}">
             </div>
             <div class="info">
-            <a href="#" class="d-block">Selamat Pagi, {{ Auth::user()->name }}!</a>
+            <a href="#" class="d-block">Hi, {{ Auth::user()->name }}!</a>
             </div>
           </div>
     
