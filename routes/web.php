@@ -20,7 +20,7 @@ use App\Http\Controllers\LoginController;
 */
 
 Route::get('/login', [LoginController::class, 'login'])->name('login');
-Route::post('/loginProcess', [LoginController::class, 'loginProcess'])->name('loginProcess');
+Route::post('/loginProcess', [LoginController::class, 'loginProcess'])->name('loginProcess')->middleware('auth');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::get('/', function () {
