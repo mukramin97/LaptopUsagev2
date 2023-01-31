@@ -4,7 +4,7 @@
 @section('content')
     <div class="card">
         <div class="card-header">
-            Data Penggunaan Laptop
+            Data Perpustakaan
         </div>
         <div class="card-body">
             <div class="row">
@@ -19,12 +19,12 @@
 
                 </div>
                 <div class="col-md-2">
-                    <label for="startDate">Tanggal Mulai</label>
+                    <label for="startDate">Tanggal Masuk</label>
                     <input type="date" id="startDate" name="startDate" class="form-control"
                         placeholder="Masukkan Tanggal Awal">
                 </div>
                 <div class="col-md-2">
-                    <label for="startDate">Tanggal Selesai</label>
+                    <label for="startDate">Tanggal Keluar</label>
                     <input type="date" id="endDate" name="endDate" class="form-control"
                         placeholder="Masukkan Tanggal Akhir">
                 </div>
@@ -45,8 +45,8 @@
                         <th>NISN</th>
                         <th>Nama</th>
                         <th>Nama Kelas</th>
-                        <th>Tanggal Peminjaman</th>
-                        <th>Tanggal Pengembalian</th>
+                        <th>Tanggal Masuk</th>
+                        <th>Tanggal Keluar</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -77,7 +77,7 @@
                 pageLength: 25,
                 serverSide: true,
                 processing: true,
-                ajax: "{{ route('penggunaan.index') }}",
+                ajax: "{{ route('perpustakaanData') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex'
@@ -95,12 +95,12 @@
                         name: 'nama_kelas'
                     },
                     {
-                        data: 'tanggal_pinjam',
-                        name: 'tanggal_pinjam'
+                        data: 'tanggal_masuk',
+                        name: 'tanggal_masuk'
                     },
                     {
-                        data: 'tanggal_kembali',
-                        name: 'tanggal_kembali'
+                        data: 'tanggal_keluar',
+                        name: 'tanggal_keluar'
                     },
                     {
                         data: 'action',
@@ -119,7 +119,7 @@
             document.getElementById('filterKelas').addEventListener('change', function() {
                 filterKelas = $("#filterKelas").val();
                 // update the table data by making a new AJAX request with the updated parameters
-                table.ajax.url("{{ route('penggunaan.index') }}?startDate=" + startDate + "&endDate=" +
+                table.ajax.url("{{ route('perpustakaanData') }}?startDate=" + startDate + "&endDate=" +
                     endDate + "&filterKelas=" + filterKelas).load();
             });
 
@@ -128,7 +128,7 @@
                 startDate = $("#startDate").val();
                 endDate = $("#endDate").val();
                 // update the table data by making a new AJAX request with the updated parameters
-                table.ajax.url("{{ route('penggunaan.index') }}?startDate=" + startDate + "&endDate=" +
+                table.ajax.url("{{ route('perpustakaanData') }}?startDate=" + startDate + "&endDate=" +
                     endDate + "&filterKelas=" + filterKelas).load();
             });
 
@@ -137,14 +137,14 @@
                 startDate = $("#startDate").val();
                 endDate = $("#endDate").val();
                 // update the table data by making a new AJAX request with the updated parameters
-                table.ajax.url("{{ route('penggunaan.index') }}?startDate=" + startDate + "&endDate=" +
+                table.ajax.url("{{ route('perpustakaanData') }}?startDate=" + startDate + "&endDate=" +
                     endDate + "&filterKelas=" + filterKelas).load();
             });
 
             //AJAX Export Penggunaan
             $('#exportPenggunaan').click(function(e) {
                 e.preventDefault();
-                window.location = "{{ route('penggunaanExport') }}" + "?filterKelas=" + $("#filterKelas")
+                window.location = "{{ route('perpustakaanExport') }}" + "?filterKelas=" + $("#filterKelas")
                     .val() + "&startDate=" + $("#startDate").val() + "&endDate=" + $("#endDate").val();
             });
 
@@ -154,7 +154,7 @@
                 // make an AJAX request to execute the custom action based on the selected id
                 $.ajax({
                     type: 'DELETE',
-                    url: "{{ route('penggunaan.destroy', ':id') }}".replace(':id', id),
+                    url: "{{ route('perpustakaan.destroy', ':id') }}".replace(':id', id),
                     data: {
                         '_token': "{{ csrf_token() }}",
                     },
@@ -163,9 +163,9 @@
                             toast: true,
                             position: 'top-end',
                             icon: 'success',
-                            title: 'Data penggunaan berhasil dihapus!',
+                            title: 'Data perpustakaan berhasil dihapus!',
                             showConfirmButton: false,
-                            timer: 1000,
+                            timer: 1500,
 
                         });
                         $('#hasil-tindakan').html(data.message);

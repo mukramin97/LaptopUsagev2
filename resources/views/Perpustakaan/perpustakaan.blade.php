@@ -5,16 +5,16 @@
     <div class="card">
         <div class="card-header">
             <div class="row">
-                <div class="col-md-2">Dashboard Penggunaan Laptop</div>
+                <div class="col-md-2">Dashboard Perpustakaan</div>
                 <div class="col-md-7"></div>
                 <div class="col-md-3 text-right">
-                    @if ($count_laptop > 0)
+                    @if ($count_siswa > 0)
                         <button class="btn btn-danger" id="refresh-button">
-                            <i class="fas fa-sync"></i> Jumlah Laptop Digunakan: {{ $count_laptop }}
+                            <i class="fas fa-sync"></i> Jumlah Siswa di Perpustakaan: {{ $count_siswa }}
                         </button>
                     @else
                         <button class="btn btn-primary" id="refresh-button">
-                            <i class="fas fa-sync"></i> Jumlah Laptop Digunakan: {{ $count_laptop }}
+                            <i class="fas fa-sync"></i> Jumlah Siswa di Perpustakaan: {{ $count_siswa }}
                         </button>
                     @endif
                 </div>
@@ -35,17 +35,17 @@
                 <div class="col-md-2">
                     <label for="modeInput">Mode Input</label>
                     <select name="modeInput" id="modeInput" class="custom-select filter">
-                        <option value="modePinjam" selected>Mode Pinjam</option>
-                        <option value="modeKembali">Mode Kembali</option>
+                        <option value="modePinjam" selected>Mode Masuk Perpustakaan</option>
+                        <option value="modeKembali">Mode Keluar Perpustakaan</option>
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="filterNISN">Input Peminjaman</label>
+                    <label for="filterNISN">Input Masuk</label>
                     <input type="text" id="filterNISN" name="filterNISN" class="form-control"
                         placeholder="Masukkan NISN Siswa">
                 </div>
                 <div class="col-md-4">
-                    <label for="filterNISNKembali">Input Pengembalian</label>
+                    <label for="filterNISNKembali">Input Keluar</label>
                     <input type="text" id="filterNISNKembali" name="filterNISNKembali" class="form-control"
                         placeholder="Masukkan NISN Siswa" disabled>
                 </div>
@@ -59,8 +59,8 @@
                         <th>NISN</th>
                         <th>Nama</th>
                         <th>Nama Kelas</th>
-                        <th>Tanggal Peminjaman</th>
-                        <th>Tanggal Pengembalian</th>
+                        <th>Tanggal Masuk</th>
+                        <th>Tanggal Kembali</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -89,7 +89,7 @@
                 pageLength: 25,
                 serverSide: true,
                 processing: true,
-                ajax: "{{ route('dashboard.index') }}",
+                ajax: "{{ route('perpustakaan.index') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex'
@@ -107,12 +107,12 @@
                         name: 'nama_kelas'
                     },
                     {
-                        data: 'tanggal_pinjam',
-                        name: 'tanggal_pinjam'
+                        data: 'tanggal_masuk',
+                        name: 'tanggal_masuk'
                     },
                     {
-                        data: 'tanggal_kembali',
-                        name: 'tanggal_kembali'
+                        data: 'tanggal_keluar',
+                        name: 'tanggal_keluar'
                     },
                     {
                         data: 'action',
@@ -120,12 +120,12 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, full, meta) {
-                            if (full.tanggal_pinjam != null && full.tanggal_kembali == null) {
-                                return '<button class="btn btn-success btn-sm custom-action-kembalikan" data-id_penggunaan="' +
-                                    full.id_penggunaan + '">Kembalikan</button>';
+                            if (full.tanggal_masuk != null && full.tanggal_keluar == null) {
+                                return '<button class="btn btn-success btn-sm custom-action-kembalikan" data-id_perpustakaan="' +
+                                    full.id_perpustakaan + '">Keluar</button>';
                             } else {
                                 return '<button class="btn btn-primary btn-sm custom-action-pinjam" data-id="' +
-                                    full.id + '">Pinjam</button>';
+                                    full.id + '">Masuk</button>';
                             }
 
                         }
@@ -138,13 +138,13 @@
             document.getElementById('filterKelas').addEventListener('change', function() {
                 filterKelas = $("#filterKelas").val();
                 // update the table data by making a new AJAX request with the updated parameters
-                table.ajax.url("{{ route('dashboard.index') }}?filterKelas=" + this.value).load();
+                table.ajax.url("{{ route('perpustakaan.index') }}?filterKelas=" + this.value).load();
             });
 
             $('#refresh-button').click(function() {
                 $.ajax({
                     type: 'GET',
-                    url: '{{ route('dashboard.index') }}',
+                    url: '{{ route('perpustakaan.index') }}',
                     success: function(data) {
                         location.reload();
                     }
@@ -159,7 +159,7 @@
                 if (e.which == 13) {
                     $.ajax({
                         type: 'POST',
-                        url: "{{ route('storeByNISN') }}",
+                        url: "{{ route('storePerpusByNISN') }}",
                         data: {
                             '_token': "{{ csrf_token() }}",
                             'filterNISN': filterNISN
@@ -170,21 +170,21 @@
                                     toast: true,
                                     position: 'top-end',
                                     icon: 'info',
-                                    title: 'Laptop Siswa Berhasil Dipinjam!',
+                                    title: 'Siswa masuk perpustakaan berhasil tercatat!',
                                     showConfirmButton: false,
-                                    timer: 1000,
+                                    timer: 1500,
                                 });
                                 $('#hasil-tindakan').html(data.message);
                                 $('#filterNISN').val('');
                                 table.ajax.reload();
-                            } else if (data.status == 'laptop masih digunakan') {
+                            } else if (data.status == 'siswa masih di dalam perpustakaan') {
                                 Swal.fire({
                                     toast: true,
                                     position: 'top-end',
                                     icon: 'error',
-                                    title: 'Laptop masih digunakan, kembalikan laptop terlebih dahulu!',
+                                    title: 'Siswa masih di dalam perpustakaan, input keluar terlebih dahulu!',
                                     showConfirmButton: false,
-                                    timer: 1000,
+                                    timer: 1500,
                                 });
                                 $('#filterNISN').val('');
                             } else {
@@ -194,7 +194,7 @@
                                     icon: 'error',
                                     title: 'Siswa tidak ditemukan!',
                                     showConfirmButton: false,
-                                    timer: 1000,
+                                    timer: 1500,
                                 });
                                 $('#filterNISN').val('');
                             }
@@ -211,7 +211,7 @@
                 if (e.which == 13) {
                     $.ajax({
                         type: 'POST',
-                        url: "{{ route('updateByNISN') }}",
+                        url: "{{ route('updatePerpusByNISN') }}",
                         data: {
                             '_token': "{{ csrf_token() }}",
                             'filterNISNKembali': filterNISNKembali
@@ -222,21 +222,21 @@
                                     toast: true,
                                     position: 'top-end',
                                     icon: 'success',
-                                    title: 'Laptop Siswa Berhasil Dikembalikan!',
+                                    title: 'Data Siswa keluar berhasil tercatat!',
                                     showConfirmButton: false,
-                                    timer: 1000,
+                                    timer: 1500,
                                 });
                                 $('#hasil-tindakan').html(data.message);
                                 $('#filterNISNKembali').val('');
                                 table.ajax.reload();
-                            } else if (data.status == 'laptop belum dipinjam') {
+                            } else if (data.status == 'siswa belum masuk perpustakaan') {
                                 Swal.fire({
                                     toast: true,
                                     position: 'top-end',
                                     icon: 'error',
-                                    title: 'Laptop belum dipinjam, pinjam laptop terlebih dahulu!',
+                                    title: 'Siswa belum masuk perpustakaan, input masuk terlebih dahulu!',
                                     showConfirmButton: false,
-                                    timer: 1000,
+                                    timer: 1500,
                                 });
                                 $('#filterNISNKembali').val('');
                             } else {
@@ -246,7 +246,7 @@
                                     icon: 'error',
                                     title: 'Siswa tidak ditemukan!',
                                     showConfirmButton: false,
-                                    timer: 1000,
+                                    timer: 1500,
                                 });
                                 $('#filterNISNKembali').val('');
                             }
@@ -262,7 +262,7 @@
                 // make an AJAX request to execute the custom action based on the selected id
                 $.ajax({
                     type: 'POST',
-                    url: "{{ route('penggunaan.store') }}",
+                    url: "{{ route('perpustakaan.store') }}",
                     data: {
                         '_token': "{{ csrf_token() }}",
                         'siswa_id': id
@@ -272,9 +272,9 @@
                             toast: true,
                             position: 'top-end',
                             icon: 'info',
-                            title: 'Laptop Siswa Berhasil Dipinjam!',
+                            title: 'Siswa masuk berhasil tercatat!',
                             showConfirmButton: false,
-                            timer: 1000,
+                            timer: 1500,
                         });
                         $('#hasil-tindakan').html(data.message);
                         table.ajax.reload();
@@ -284,23 +284,23 @@
 
             //AJAX BUTTON PENGEMBALIAN
             $(document).on('click', '.custom-action-kembalikan', function() {
-                var id_penggunaan = $(this).data('id_penggunaan');
+                var id_perpustakaan = $(this).data('id_perpustakaan');
                 // make an AJAX request to execute the custom action based on the selected id
                 $.ajax({
                     type: 'PUT',
-                    url: "{{ route('penggunaan.update', ':id') }}".replace(':id', id_penggunaan),
+                    url: "{{ route('perpustakaan.update', ':id') }}".replace(':id', id_perpustakaan),
                     data: {
                         '_token': "{{ csrf_token() }}",
-                        'id': id_penggunaan
+                        'id': id_perpustakaan
                     },
                     success: function(data) {
                         Swal.fire({
                             toast: true,
                             position: 'top-end',
                             icon: 'success',
-                            title: 'Laptop Siswa Berhasil Dikembalikan!',
+                            title: 'Siswa keluar berhasil tercatat!',
                             showConfirmButton: false,
-                            timer: 1000,
+                            timer: 1500,
 
                         });
                         $('#hasil-tindakan').html(data.message);

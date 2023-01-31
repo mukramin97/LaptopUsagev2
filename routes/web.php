@@ -7,6 +7,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\PenggunaanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\PerpustakaanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,28 +21,32 @@ use App\Http\Controllers\LoginController;
 */
 
 Route::get('/login', [LoginController::class, 'login'])->name('login');
-Route::post('/loginProcess', [LoginController::class, 'loginProcess'])->name('loginProcess')->middleware('auth');
+Route::post('/loginProcess', [LoginController::class, 'loginProcess'])->name('loginProcess');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::get('/', function () {
     return redirect('/dashboard');
 })->middleware('auth');
 
-Route::middleware('auth')->resource('kelas', KelasController::class)->except(['destroy']);
-Route::delete('kelas/{id}', [KelasController::class, 'destroy'])->name('kelas.destroy')->middleware('superadmin');
+Route::middleware('superadmin')->resource('kelas', KelasController::class);
 Route::get('kelasExport', [KelasController::class, 'kelasExport'])->name('kelasExport')->middleware('auth');
-Route::post('kelasImport', [KelasController::class, 'kelasImport'])->name('kelasImport')->middleware('auth');
+Route::post('kelasImport', [KelasController::class, 'kelasImport'])->name('kelasImport')->middleware('superadmin');
 
-Route::middleware('auth')->resource('siswa', SiswaController::class)->except(['destroy']);
-Route::delete('siswa/{id}', [SiswaController::class, 'destroy'])->name('siswa.destroy')->middleware('superadmin');
+Route::middleware('superadmin')->resource('siswa', SiswaController::class);
 Route::get('siswaExport', [SiswaController::class, 'siswaExport'])->name('siswaExport')->middleware('auth');
-Route::post('siswaImport', [SiswaController::class, 'siswaImport'])->name('siswaImport')->middleware('auth');
+Route::post('siswaImport', [SiswaController::class, 'siswaImport'])->name('siswaImport')->middleware('superadmin');
 
-Route::middleware('auth')->resource('penggunaan', PenggunaanController::class)->except(['destroy']);
-Route::delete('penggunaan/{id}', [PenggunaanController::class, 'destroy'])->name('penggunaan.destroy')->middleware('superadmin');
-Route::post('storeByNISN', [PenggunaanController::class, 'storeByNISN'])->name('storeByNISN')->middleware('auth');
-Route::post('updateByNISN', [PenggunaanController::class, 'updateByNISN'])->name('updateByNISN')->middleware('auth');
-Route::get('penggunaanExport', [PenggunaanController::class, 'penggunaanExport'])->name('penggunaanExport')->middleware('auth');
+Route::middleware('adminloker')->resource('penggunaan', PenggunaanController::class)->except(['destroy']);
+Route::middleware('superadmin')->resource('penggunaan', PenggunaanController::class)->only(['destroy']);
+Route::post('storeByNISN', [PenggunaanController::class, 'storeByNISN'])->name('storeByNISN')->middleware('adminloker');
+Route::post('updateByNISN', [PenggunaanController::class, 'updateByNISN'])->name('updateByNISN')->middleware('adminloker');
+Route::get('penggunaanExport', [PenggunaanController::class, 'penggunaanExport'])->name('penggunaanExport')->middleware('adminloker');
 
-Route::middleware('auth')->resource('dashboard', DashboardController::class)->except(['destroy']);
-Route::delete('dashboard/{id}', [DashboardController::class, 'destroy'])->name('dashboard.destroy')->middleware('superadmin');
+Route::middleware('auth')->resource('dashboard', DashboardController::class)->only(['index']);
+
+Route::middleware('adminperpus')->resource('perpustakaan', PerpustakaanController::class)->except(['destroy']);
+Route::middleware('superadmin')->resource('perpustakaan', PerpustakaanController::class)->only(['destroy']);
+Route::post('storePerpusByNISN', [PerpustakaanController::class, 'storePerpusByNISN'])->name('storePerpusByNISN')->middleware('adminperpus');
+Route::post('updatePerpusByNISN', [PerpustakaanController::class, 'updatePerpusByNISN'])->name('updatePerpusByNISN')->middleware('adminperpus');
+Route::get('perpustakaanData', [PerpustakaanController::class, 'indexData'])->name('perpustakaanData')->middleware('adminperpus');
+Route::get('perpustakaanExport', [PerpustakaanController::class, 'perpustakaanExport'])->name('perpustakaanExport')->middleware('adminperpus');

@@ -77,6 +77,9 @@
                         data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                   with font-awesome or any other icon font library -->
+
+                        <li class="nav-header font-weight-bold">MENU PENGGUNAAN LAPTOP</li>
+
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }} "
                                 href="{{ route('dashboard.index') }}">
@@ -86,6 +89,39 @@
                                 </p>
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('penggunaan.index') ? 'active' : '' }} "
+                                href="{{ route('penggunaan.index') }}">
+                                <i class="nav-icon fas fa-book"></i>
+                                <p>
+                                    Penggunaan Laptop
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-header font-weight-bold">MENU PERPUSTAKAAN</li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('perpustakaan.index') ? 'active' : '' }} "
+                                href="{{ route('perpustakaan.index') }}">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>
+                                    Dashboard
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('perpustakaanData') ? 'active' : '' }} "
+                                href="{{ route('perpustakaanData') }}">
+                                <i class="nav-icon fas fa-book-reader"></i>
+                                <p>
+                                    Perpustakaan
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-header font-weight-bold">SETTINGS</li>
 
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('siswa.index') ? 'active' : '' }}"
@@ -105,15 +141,7 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('penggunaan.index') ? 'active' : '' }} "
-                                href="{{ route('penggunaan.index') }}">
-                                <i class="nav-icon fas fa-book"></i>
-                                <p>
-                                    Penggunaan
-                                </p>
-                            </a>
-                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('logout') }}">
                                 <i class="nav-icon fas fa-sign-out-alt"></i>

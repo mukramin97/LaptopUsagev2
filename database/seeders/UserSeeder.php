@@ -18,9 +18,20 @@ class UserSeeder extends Seeder
     {
         $now = Carbon::now();
         DB::table('users')->insert([
-            'name' => 'Admin',
-            'email' => 'admin@admin.com',
-            'password' => bcrypt('Admin.123'),
+            'name' => 'Admin Perpus',
+            'email' => 'adminperpus@admin.com',
+            'password' => bcrypt('Perpus.123'),
+            'is_adminperpus' => true,
+            'remember_token' => Str::random(60),
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        DB::table('users')->insert([
+            'name' => 'Admin Loker',
+            'email' => 'adminloker@admin.com',
+            'password' => bcrypt('Loker.123'),
+            'is_adminloker' => true,
             'remember_token' => Str::random(60),
             'created_at' => $now,
             'updated_at' => $now,

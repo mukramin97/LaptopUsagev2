@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use DB;
 use Illuminate\Http\Request;
-use App\Models\Laptop;
 use App\Models\Kelas;
 use App\Models\Siswa;
 use App\Models\Penggunaan;
@@ -23,6 +22,7 @@ class DashboardController extends Controller
     {
         $kelasDt = Kelas::get();
         $dashboardDt = Siswa::get();
+        $count_laptop = Penggunaan::whereNull('tanggal_kembali')->count();
         
       
         //Thanks ChatGPT, i don't know how it is working!
@@ -35,7 +35,7 @@ class DashboardController extends Controller
             ->when($request->filterKelas, function($query)use ($request){ return
                 $query->where('table_siswa.kelas_id', $request->filterKelas);
             })
-            ->select('table_siswa.*','table_penggunaan.id AS id_penggunaan', 'table_penggunaan.tanggal_pinjam', 'table_penggunaan.tanggal_kembali', 'table_kelas.nama_kelas')
+            ->select('table_siswa.*','table_penggunaan.id AS id_penggunaan', 'table_penggunaan.tanggal_pinjam', 'table_penggunaan.tanggal_kembali', 'table_kelas.nama_kelas',)
             ->get();
 
 
@@ -70,7 +70,7 @@ class DashboardController extends Controller
             
             return $allData;
         }
-        return view('Dashboard.home', compact('kelasDt', 'dashboardDt'));
+        return view('Dashboard.home', compact('kelasDt', 'dashboardDt', 'count_laptop'));
     }
 
     /**

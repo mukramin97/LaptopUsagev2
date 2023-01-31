@@ -28,5 +28,9 @@ class Siswa extends Model
         return $this->hasMany(Penggunaan::class);
     }
 
+    public function perpustakaan(){
+        return $this->hasMany(Perpustakaan::class);
+    }
+
     
 }
