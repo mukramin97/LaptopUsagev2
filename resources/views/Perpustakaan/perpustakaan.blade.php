@@ -10,11 +10,11 @@
                 <div class="col-md-3 text-right">
                     @if ($count_siswa > 0)
                         <button class="btn btn-danger" id="refresh-button">
-                            <i class="fas fa-sync"></i> Jumlah Siswa di Perpustakaan: {{ $count_siswa }}
+                            <i class="fas fa-sync"></i> Jumlah Siswa Hari Ini: {{ $count_siswa }}
                         </button>
                     @else
                         <button class="btn btn-primary" id="refresh-button">
-                            <i class="fas fa-sync"></i> Jumlah Siswa di Perpustakaan: {{ $count_siswa }}
+                            <i class="fas fa-sync"></i> Jumlah Siswa Hari Ini: {{ $count_siswa }}
                         </button>
                     @endif
                 </div>

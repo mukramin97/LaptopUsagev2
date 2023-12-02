@@ -27,7 +27,8 @@ class PerpustakaanController extends Controller
     {
         $kelasDt = Kelas::get();
         $perpustakaanDt = Siswa::get();
-        $count_siswa = Perpustakaan::whereNull('tanggal_keluar')->count();
+        $currentDate = Carbon::today();
+        $count_siswa = Perpustakaan::whereDate('tanggal_masuk', $currentDate)->count();
         
       
         //Thanks ChatGPT, i don't know how it is working!
