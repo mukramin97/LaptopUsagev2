@@ -10,7 +10,7 @@
 CREATE TABLE IF NOT EXISTS `failed_jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,S
   `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -61,6 +61,26 @@ CREATE TABLE IF NOT EXISTS `personal_access_tokens` (
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_superadmin` tinyint(1) NOT NULL DEFAULT '0',
+  `is_adminloker` tinyint(1) NOT NULL DEFAULT '0',
+  `is_adminperpus` tinyint(1) NOT NULL DEFAULT '0',
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `is_superadmin`, `is_adminloker`, `is_adminperpus`, `remember_token`, `created_at`, `updated_at`) VALUES
+	(1, 'Admin Perpus', 'adminperpus@admin.com', NULL, '$2y$10$tlfSAa0lAyGQzFH4PNzz3.2Z6YPx5OjzC/eeAZTtLAb.OPKz8xoai', 0, 0, 1, '4LctJ2UEqjl8fiPmThFJEi30UchdVESqDo6kqyNUgvE9tyB5SCz5hDW8tbY5', '2023-01-31 09:35:12', '2023-01-31 09:35:12'),
+	(2, 'Admin Loker', 'adminloker@admin.com', NULL, '$2y$10$As7qfqwHD4zuWJcGB/uwiuInqhLYL8JuH1SEwsB4zEvhbPx0VjYgG', 0, 1, 0, 'UQenc301QgTy2jC9cto2QcNoRp0xy2ImYBaTwumytUq1MCm1O03qNrzsv7aa', '2023-01-31 09:35:12', '2023-01-31 09:35:12'),
+	(3, 'SuperAdmin', 'superadmin@admin.com', NULL, '$2y$10$mY.ZGgVYLDP6ECzww3CDpuW.b3SvuHKNBynGjtUq6zhC7f6Rd5JqS', 1, 0, 0, 'm32Pz8Jclnadko4OLeZykWXrUv7Q4hAnb9GExWISEMs6dheBvlTOx97gv4Ox', '2023-01-31 09:35:12', '2023-01-31 09:35:12');
 
 CREATE TABLE IF NOT EXISTS `table_kelas` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -81,6 +101,20 @@ CREATE TABLE IF NOT EXISTS `table_laptop` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `table_siswa` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `NISN` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `laptop_id` bigint unsigned DEFAULT NULL,
+  `kelas_id` bigint unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `table_siswa_laptop_id_foreign` (`laptop_id`),
+  KEY `table_siswa_kelas_id_foreign` (`kelas_id`),
+  CONSTRAINT `table_siswa_kelas_id_foreign` FOREIGN KEY (`kelas_id`) REFERENCES `table_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `table_siswa_laptop_id_foreign` FOREIGN KEY (`laptop_id`) REFERENCES `table_laptop` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `table_penggunaan` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -107,46 +141,11 @@ CREATE TABLE IF NOT EXISTS `table_perpustakaan` (
   CONSTRAINT `table_perpustakaan_siswa_id_foreign` FOREIGN KEY (`siswa_id`) REFERENCES `table_siswa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `add_tanggal_keluar_trigger` BEFORE INSERT ON `table_perpustakaan` FOR EACH ROW BEGIN
+                SET NEW.tanggal_keluar = DATE_ADD(NEW.tanggal_masuk, INTERVAL 1 HOUR);
+            END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
 
-CREATE TABLE IF NOT EXISTS `table_siswa` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `NISN` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `laptop_id` bigint unsigned DEFAULT NULL,
-  `kelas_id` bigint unsigned DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `table_siswa_laptop_id_foreign` (`laptop_id`),
-  KEY `table_siswa_kelas_id_foreign` (`kelas_id`),
-  CONSTRAINT `table_siswa_kelas_id_foreign` FOREIGN KEY (`kelas_id`) REFERENCES `table_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `table_siswa_laptop_id_foreign` FOREIGN KEY (`laptop_id`) REFERENCES `table_laptop` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `is_superadmin` tinyint(1) NOT NULL DEFAULT '0',
-  `is_adminloker` tinyint(1) NOT NULL DEFAULT '0',
-  `is_adminperpus` tinyint(1) NOT NULL DEFAULT '0',
-  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `is_superadmin`, `is_adminloker`, `is_adminperpus`, `remember_token`, `created_at`, `updated_at`) VALUES
-	(1, 'Admin Perpus', 'adminperpus@admin.com', NULL, '$2y$10$tlfSAa0lAyGQzFH4PNzz3.2Z6YPx5OjzC/eeAZTtLAb.OPKz8xoai', 0, 0, 1, '4LctJ2UEqjl8fiPmThFJEi30UchdVESqDo6kqyNUgvE9tyB5SCz5hDW8tbY5', '2023-01-31 09:35:12', '2023-01-31 09:35:12'),
-	(2, 'Admin Loker', 'adminloker@admin.com', NULL, '$2y$10$As7qfqwHD4zuWJcGB/uwiuInqhLYL8JuH1SEwsB4zEvhbPx0VjYgG', 0, 1, 0, 'UQenc301QgTy2jC9cto2QcNoRp0xy2ImYBaTwumytUq1MCm1O03qNrzsv7aa', '2023-01-31 09:35:12', '2023-01-31 09:35:12'),
-	(3, 'SuperAdmin', 'superadmin@admin.com', NULL, '$2y$10$mY.ZGgVYLDP6ECzww3CDpuW.b3SvuHKNBynGjtUq6zhC7f6Rd5JqS', 1, 0, 0, 'm32Pz8Jclnadko4OLeZykWXrUv7Q4hAnb9GExWISEMs6dheBvlTOx97gv4Ox', '2023-01-31 09:35:12', '2023-01-31 09:35:12');
-
-/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
